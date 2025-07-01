@@ -4,4 +4,5 @@ const router = Router();
 
 router.post('/register', accountAdminController.registerAdmin);
 
+router.post('/login', accountAdminController.login)
 export default router;
