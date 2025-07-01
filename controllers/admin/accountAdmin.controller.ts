@@ -3,6 +3,19 @@ import bcrypt from "bcryptjs";
 import AccountAdmin from "../../models/accountAdmin.model";
 import jwt from "jsonwebtoken";
 export const registerAdmin = async (req: Request, res: Response) => {
+  const findEmail = await AccountAdmin.findOne({
+    email: req.body.email
+  });
+
+  if(findEmail) {
+    res.status(400).json({
+      code: "error",
+      message: "Email đã tồn tại"
+    })
+    return;
+  }
+
+
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(req.body.password, salt);
   req.body.password = hash;
