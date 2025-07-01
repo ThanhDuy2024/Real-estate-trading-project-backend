@@ -16,6 +16,3 @@ app.use('/api/admin', adminApi);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
-//userName: thanhduyuth
-//password: FD7LOKfcRWFwJ2HR
