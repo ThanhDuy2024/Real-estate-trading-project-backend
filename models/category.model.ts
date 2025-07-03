@@ -15,6 +15,10 @@ export const schema = new Schema({
   deletedBy: String,
   updatedBy: String,
   createbBy: String,
+  slug: {
+    type: String,
+    slug: "name"
+  }
 }, {
   timestamps: true
 })
