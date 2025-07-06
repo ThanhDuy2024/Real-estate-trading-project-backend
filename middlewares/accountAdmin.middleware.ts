@@ -6,6 +6,13 @@ import { accountAdmin } from "../interfaces/accountAdmin.interface";
 export const accountVerify = async (req: accountAdmin, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.token;
+    if(!token) {
+      res.status(404).json({
+        code: "error",
+        message: "You must login to use this feature!"
+      })
+    }
+
     const decode = jwt.verify(token, String(process.env.JWT_KEY)) as JwtPayload;
     if(!decode) {
       res.clearCookie(token);
