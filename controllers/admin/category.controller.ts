@@ -7,7 +7,9 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
   } else {
     delete req.body.image;
   }
-  console.log(req.accountAdmin);
+  req.body.updatedBy = req.accountAdmin._id;
+  req.body.createbBy = req.accountAdmin._id;
+  req.body.parentId = JSON.parse(req.body.parentIdArray);
   const newRecord = new Category(req.body);
   await newRecord.save();
   res.json({
