@@ -23,7 +23,8 @@ export const accountVerify = async (req: accountAdmin, res: Response, next: Next
     }
 
     const record = await AccountAdmin.findOne({
-      email: decode.email
+      email: decode.email,
+      deleted: false
     });
 
     if(!record) {

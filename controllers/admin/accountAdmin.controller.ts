@@ -34,7 +34,8 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const findEmail = await AccountAdmin.findOne({
-      email: email
+      email: email,
+      deleted: false
     });
 
     if (!findEmail) {
