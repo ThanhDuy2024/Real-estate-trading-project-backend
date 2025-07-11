@@ -24,7 +24,7 @@ export const registerValidate = (req: Request, res: Response, next: NextFunction
 
   const { error } = schema.validate(req.body);
 
-  if(error) {
+  if (error) {
     res.json({
       code: "error",
       message: error.details[0].message,
@@ -52,7 +52,7 @@ export const loginValidate = (req: Request, res: Response, next: NextFunction) =
 
   const { error } = schema.validate(req.body);
 
-  if(error) {
+  if (error) {
     res.json({
       code: "error",
       message: error.details[0].message,
@@ -60,5 +60,35 @@ export const loginValidate = (req: Request, res: Response, next: NextFunction) =
     return;
   }
 
+  next();
+}
+
+export const profileValidate = (req: Request, res: Response, next: NextFunction) => {
+  const schema = Joi.object({
+    id: Joi.string().required()
+      .messages({
+        "string.empty": "id is must have!",
+      }),
+    fullName: Joi.string().min(6).max(50).required()
+      .messages({
+        "string.empty": "full name is not empty",
+        "string.min": "full name must be at least 6 characters",
+        "string.max": "full name must be at highest 50 characters"
+      }),
+    avatar: Joi.string().allow(""),
+    phone: Joi.string().allow(""),
+    address: Joi.string().allow(""),
+    roleId: Joi.string().allow("")
+  });
+
+  const { error } = schema.validate(req.body);
+
+  if(error) {
+    res.json({
+      code: "error",
+      message: error.details[0].message,
+    });
+    return;
+  }
   next();
 }
