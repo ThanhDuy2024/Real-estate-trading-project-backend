@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import AccountAdmin from "../../models/accountAdmin.model";
 import jwt from "jsonwebtoken";
+import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 export const registerAdmin = async (req: Request, res: Response) => {
   const findEmail = await AccountAdmin.findOne({
     email: req.body.email
@@ -98,5 +99,39 @@ export const logout = async (req: Request, res: Response) => {
     res.json({
       code: "error"
     })
+  }
+}
+
+export const profileEdit = async (req: accountAdmin, res: Response) => {
+  if(req.file) {
+    req.body.avatar = req.file.path;
+  } else {
+    delete req.body.avatar;
+  }
+
+  if(req.accountAdmin._id != req.body.id) {
+    res.json({
+      code: "error",
+    });
+    return;
+  } else {
+    delete req.body.id
+  }
+
+  await AccountAdmin.updateOne({
+    _id: req.accountAdmin._id,
+    deleted: false
+  }, req.body);
+
+  try {
+    res.json({
+      code: "success",
+      message: "Your profile had been edit"
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+    });
   }
 }
