@@ -4,6 +4,7 @@ export const profile = async (req: accountAdmin, res: Response) => {
   const dataFinal = {
     id: req.accountAdmin._id,
     fullName: req.accountAdmin.fullName,
+    email: req.accountAdmin.email,
     avatar: req.accountAdmin.avatar ? req.accountAdmin.avatar : "",
     phone: req.accountAdmin.phone ? req.accountAdmin.phone : "",
     address: req.accountAdmin.address ? req.accountAdmin.address : "",
