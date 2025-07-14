@@ -12,4 +12,5 @@ const upload = multer({
 
 router.post("/create", upload.single("image"), middleware.accountVerify, validate.categoryValidate, categoryController.categoryCreate);
 
+router.get('/list', middleware.accountVerify, categoryController.categoryList);
 export default router;

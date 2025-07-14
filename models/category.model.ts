@@ -7,6 +7,7 @@ export const schema = new Schema({
   parentId: Array,
   image: String,
   note: String,
+  status: String,
   deleted: {
     type: Boolean,
     default: false,
@@ -14,7 +15,7 @@ export const schema = new Schema({
   deletedAt: Date,
   deletedBy: String,
   updatedBy: String,
-  createbBy: String,
+  createdBy: String,
   slug: {
     type: String,
     slug: "name"

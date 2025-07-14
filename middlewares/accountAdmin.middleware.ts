@@ -11,6 +11,7 @@ export const accountVerify = async (req: accountAdmin, res: Response, next: Next
         code: "error",
         message: "You must login to use this feature!"
       })
+      return;
     }
 
     const decode = jwt.verify(token, String(process.env.JWT_KEY)) as JwtPayload;

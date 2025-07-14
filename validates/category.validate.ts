@@ -9,6 +9,10 @@ export const categoryValidate = (req: Request, res: Response, next: NextFunction
         "string.min": "category name must be least 5 characters!",
         "string.max": "category name is only highest 50 characters!"
       }),
+    status: Joi.string().required()
+      .messages({
+        "string.empty": "status must have!"
+      }),
     image: Joi.allow(""),
     note: Joi.allow(""),
     parentIdArray: Joi.allow(""),
