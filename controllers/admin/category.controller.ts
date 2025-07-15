@@ -9,6 +9,11 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
   } else {
     delete req.body.image;
   }
+
+  if(!req.body.position) {
+    const count = await Category.countDocuments({}) + 1;
+    req.body.position = count;
+  }
   req.body.updatedBy = req.accountAdmin._id;
   req.body.createbBy = req.accountAdmin._id;
   req.body.parentId = JSON.parse(req.body.parentIdArray);
@@ -34,6 +39,7 @@ export const categoryList = async (req: Request, res: Response) => {
       note: item.note,
       status: item.status,
       image: item.image ? item.image : "",
+      position: item.position,
       updatedBy: "",
       createdBy: "",
       createdAt: "",

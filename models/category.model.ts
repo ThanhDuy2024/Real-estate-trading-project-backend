@@ -8,6 +8,7 @@ export const schema = new Schema({
   image: String,
   note: String,
   status: String,
+  position: Number,
   deleted: {
     type: Boolean,
     default: false,

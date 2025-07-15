@@ -16,6 +16,7 @@ export const categoryValidate = (req: Request, res: Response, next: NextFunction
     image: Joi.allow(""),
     note: Joi.allow(""),
     parentIdArray: Joi.allow(""),
+    position: Joi.allow(""),
   });
 
   const { error } = schema.validate(req.body);
