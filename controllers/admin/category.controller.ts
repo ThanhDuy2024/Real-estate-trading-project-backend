@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { raw, Request, Response } from "express"
 import { Category } from "../../models/category.model";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
@@ -19,18 +19,18 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
   }
   req.body.updatedBy = req.accountAdmin._id;
   req.body.createdBy = req.accountAdmin._id;
-  
+
   let check;
-  if(req.body.parentId) {
+  if (req.body.parentId) {
     const array = JSON.parse(req.body.parentId);
     array.forEach((item: any) => {
       check = record.find(category => category.id === item);
-      if(!check) {
+      if (!check) {
         check = "not ok";
         return;
       };
     });
-    if(check === "not ok") {
+    if (check === "not ok") {
       res.json({
         code: "error",
       });
@@ -119,7 +119,7 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
       deleted: false
     });
 
-    if(!checkId) {
+    if (!checkId) {
       res.json({
         code: "error"
       });
@@ -129,25 +129,25 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
     const record = await Category.find({
       deleted: false
     })
-    if(req.file) {
+    if (req.file) {
       req.body.image = req.file.path;
     } else {
       delete req.body.image;
     }
 
-    if(req.body.parentId) {
+    if (req.body.parentId) {
       const array = JSON.parse(req.body.parentId);
 
       let check;
       array.forEach((item: any) => {
         check = record.find(category => category.id == item);
-        if(!check) {
+        if (!check) {
           check = "not ok"
           return;
         }
       });
-      
-      if(check === "not ok") {
+
+      if (check === "not ok") {
         res.json({
           code: "error",
         });
@@ -183,7 +183,7 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
       _id: req.params.id,
     });
 
-    if(!record) {
+    if (!record) {
       res.json({
         code: "error",
       });
@@ -194,7 +194,8 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
       _id: req.params.id,
     }, {
       deleted: true,
-      deletedBy: req.accountAdmin._id
+      deletedBy: req.accountAdmin._id,
+      deletedAt: Date.now(),
     })
 
     res.json({
@@ -208,4 +209,43 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
       message: error,
     })
   }
+}
+
+export const trashCategoryList = async (req: accountAdmin, res: Response) => {
+  const record = await Category.find({
+    deleted: true
+  })
+
+  const dataFinal = [];
+
+  for (const item of record) {
+    const rawData = {
+      id: item._id,
+      name: item.name,
+      image: item.image ? item.image : "",
+      deletedBy: "",
+      deletedAt: ""
+    }
+
+    if (item.deletedBy) {
+      const check = await AccountAdmin.findOne({
+        _id: item.deletedBy,
+      });
+
+      if (check) {
+        rawData.deletedBy = String(check.fullName);
+      }
+    }
+
+    if (item.deletedAt) {
+      const dateFormat = moment(item.deletedAt).format("HH:mm - DD/MM/YYYY");
+      rawData.deletedAt = String(dateFormat);
+    }
+
+    dataFinal.push(rawData);
+  }
+  res.json({
+    code: "success",
+    categories: dataFinal
+  });
 }
