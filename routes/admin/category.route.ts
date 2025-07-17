@@ -14,5 +14,6 @@ router.post("/create", upload.single("image"), middleware.accountVerify, validat
 
 router.get('/list', middleware.accountVerify, categoryController.categoryList);
 
-router.post('/edit/:id', upload.single("image"), middleware.accountVerify, categoryController.categoryEdit);
+router.post('/edit/:id', upload.single("image"), middleware.accountVerify, validate.categoryValidate, categoryController.categoryEdit);
+
 export default router;

@@ -3,7 +3,6 @@ import { Category } from "../../models/category.model";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
-import { string } from "joi";
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
     req.body.image = req.file.path;
