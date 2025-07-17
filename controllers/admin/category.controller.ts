@@ -15,8 +15,8 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
     req.body.position = count;
   }
   req.body.updatedBy = req.accountAdmin._id;
-  req.body.createbBy = req.accountAdmin._id;
-  req.body.parentId = JSON.parse(req.body.parentIdArray);
+  req.body.createdBy = req.accountAdmin._id;
+  req.body.parentId = JSON.parse(req.body.parentId);
   const newRecord = new Category(req.body);
   await newRecord.save();
   res.json({
@@ -134,6 +134,8 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
       }
       req.body.parentId = array;
     }
+
+    req.body.updatedBy = req.accountAdmin._id;
 
     await Category.updateOne({
       _id: req.params.id,
