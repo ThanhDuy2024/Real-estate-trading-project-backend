@@ -4,6 +4,9 @@ import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
+  const record = await Category.find({
+    deleted: false,
+  })
   if (req.file) {
     req.body.image = req.file.path;
   } else {
@@ -16,7 +19,25 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
   }
   req.body.updatedBy = req.accountAdmin._id;
   req.body.createdBy = req.accountAdmin._id;
-  req.body.parentId = JSON.parse(req.body.parentId);
+  
+  let check;
+  if(req.body.parentId) {
+    const array = JSON.parse(req.body.parentId);
+    array.forEach((item: any) => {
+      check = record.find(category => category.id === item);
+      if(!check) {
+        check = "not ok";
+        return;
+      };
+    });
+    if(check === "not ok") {
+      res.json({
+        code: "error",
+      });
+      return;
+    }
+    req.body.parentId = array;
+  }
   const newRecord = new Category(req.body);
   await newRecord.save();
   res.json({
