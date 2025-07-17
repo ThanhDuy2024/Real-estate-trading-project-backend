@@ -3,6 +3,7 @@ import { Category } from "../../models/category.model";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
+import { string } from "joi";
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
     req.body.image = req.file.path;
@@ -10,7 +11,7 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
     delete req.body.image;
   }
 
-  if(!req.body.position) {
+  if (!req.body.position) {
     const count = await Category.countDocuments({}) + 1;
     req.body.position = count;
   }
@@ -29,6 +30,8 @@ export const categoryList = async (req: Request, res: Response) => {
   const dataFinal = [];
   const record = await Category.find({
     deleted: false
+  }).sort({
+    position: "desc"
   });
 
   for (const item of record) {
@@ -87,4 +90,66 @@ export const categoryList = async (req: Request, res: Response) => {
     code: "success",
     data: dataFinal,
   })
+}
+
+export const categoryEdit = async (req: accountAdmin, res: Response) => {
+  try {
+    const checkId = await Category.findOne({
+      _id: req.params.id,
+      deleted: false
+    });
+
+    if(!checkId) {
+      res.json({
+        code: "error"
+      });
+      return;
+    }
+
+    const record = await Category.find({
+      deleted: false
+    })
+    if(req.file) {
+      req.body.image = req.file.path;
+    } else {
+      delete req.body.image;
+    }
+
+    if(req.body.parentId) {
+      const array = JSON.parse(req.body.parentId);
+
+      let check;
+      array.forEach((item: any) => {
+        check = record.find(category => category.id == item);
+        if(!check) {
+          check = "not ok"
+          return;
+        }
+      });
+      
+      if(check === "not ok") {
+        res.json({
+          code: "error",
+        });
+        return;
+      }
+      req.body.parentId = array;
+    }
+
+    await Category.updateOne({
+      _id: req.params.id,
+      deleted: false
+    }, req.body);
+
+    res.json({
+      code: "success",
+      message: "Edit successfully"
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Edit failure"
+    })
+  }
 }
