@@ -175,3 +175,37 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
     })
   }
 }
+
+export const categoryDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const record = await Category.findOne({
+      deleted: false,
+      _id: req.params.id,
+    });
+
+    if(!record) {
+      res.json({
+        code: "error",
+      });
+      return;
+    };
+
+    await Category.updateOne({
+      _id: req.params.id,
+    }, {
+      deleted: true,
+      deletedBy: req.accountAdmin._id
+    })
+
+    res.json({
+      code: "success",
+      message: "Delete successfully"
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: error,
+    })
+  }
+}
