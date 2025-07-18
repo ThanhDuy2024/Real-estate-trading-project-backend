@@ -14,7 +14,7 @@ router.post("/create", upload.single("image"), middleware.accountVerify, validat
 
 router.get('/list', middleware.accountVerify, categoryController.categoryList);
 
-router.post('/edit/:id', upload.single("image"), middleware.accountVerify, validate.categoryValidate, categoryController.categoryEdit);
+router.patch('/edit/:id', upload.single("image"), middleware.accountVerify, validate.categoryValidate, categoryController.categoryEdit);
 
 router.delete('/delete/:id', middleware.accountVerify, categoryController.categoryDelete);
 
