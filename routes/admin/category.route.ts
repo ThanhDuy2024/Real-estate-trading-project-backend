@@ -20,4 +20,6 @@ router.delete('/delete/:id', middleware.accountVerify, categoryController.catego
 
 router.get('/trash/list', middleware.accountVerify, categoryController.trashCategoryList);
 
+router.patch('/trash/recovery/:id', middleware.accountVerify, categoryController.trashCategoryRecovery);
+
 export default router;

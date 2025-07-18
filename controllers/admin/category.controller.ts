@@ -249,3 +249,35 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
     categories: dataFinal
   });
 }
+
+export const trashCategoryRecovery = async (req: accountAdmin, res: Response) => {
+  try {
+    const check = await Category.findOne({
+      deleted: true,
+      _id: req.params.id
+    });
+
+    if(!check) {
+      res.json({
+        code: "error"
+      });
+      return;
+    }
+
+    await Category.updateOne({
+      _id: req.params.id,
+    }, {
+      deleted: false,
+      updatedBy: req.accountAdmin._id
+    });
+    res.json({
+      code: "success",
+      message: "Recovery has been successful"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Recovery has not been successful"
+    })
+  }
+}
