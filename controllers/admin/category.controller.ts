@@ -281,3 +281,33 @@ export const trashCategoryRecovery = async (req: accountAdmin, res: Response) =>
     })
   }
 }
+
+export const trashCategoryDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const check = await Category.findOne({
+      deleted: true,
+      _id: req.params.id
+    });
+
+    if(!check) {
+      res.json({
+        code: "error"
+      });
+      return;
+    };
+
+    await Category.deleteOne({
+      _id: check.id
+    });
+    res.json({
+      code: "success",
+      message: "Category has been deleted forever"
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Category has not been deleted forever"
+    })
+  }
+}
