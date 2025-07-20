@@ -52,12 +52,21 @@ export const categoryList = async (req: Request, res: Response) => {
     deleted: false
   }
 
+  //search cateogry
   if(req.query.search) {
     const keyword = slugify(String(req.query.search), {
       lower: true
     });
     find.slug = keyword;
   }
+  //end search category
+
+  //status fillters
+  if(req.query.status === "active" || req.query.status === "inactive") {
+    find.status = req.query.status;
+  }
+  //end status fillters
+
   const dataFinal = [];
   const record = await Category.find(find).sort({
     position: "desc"
