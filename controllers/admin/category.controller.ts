@@ -3,6 +3,7 @@ import { Category } from "../../models/category.model";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
+import slugify from "slugify";
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
   const record = await Category.find({
     deleted: false,
@@ -47,10 +48,18 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
 };
 
 export const categoryList = async (req: Request, res: Response) => {
-  const dataFinal = [];
-  const record = await Category.find({
+  const find:any = {
     deleted: false
-  }).sort({
+  }
+
+  if(req.query.search) {
+    const keyword = slugify(String(req.query.search), {
+      lower: true
+    });
+    find.slug = keyword;
+  }
+  const dataFinal = [];
+  const record = await Category.find(find).sort({
     position: "desc"
   });
 
