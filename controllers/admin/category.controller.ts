@@ -137,6 +137,7 @@ export const categoryList = async (req: Request, res: Response) => {
   res.json({
     code: "success",
     data: dataFinal,
+    pages: paginationFeature.pages,
   })
 }
 
