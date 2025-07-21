@@ -67,6 +67,21 @@ export const categoryList = async (req: Request, res: Response) => {
   }
   //end status fillters
 
+  //date fillters
+  const dataDate:any = {}
+  if(req.query.startDate) {
+    const startDate = moment(String(req.query.startDate)).startOf("date").toDate();
+    dataDate.$gte = startDate;
+  }
+
+  if(req.query.endDate) {
+    const endDate = moment(String(req.query.endDate)).endOf("date").toDate();
+    dataDate.$lte = endDate;
+  }
+
+  find.createdAt = dataDate;
+  //end date fillters
+
   const dataFinal = [];
   const record = await Category.find(find).sort({
     position: "desc"
