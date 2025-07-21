@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { Category } from "../../models/category.model";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
+import * as managementFeature from "../../helpers/managementFeature.helper"
 import moment from "moment";
 import slugify from "slugify";
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
@@ -68,42 +69,18 @@ export const categoryList = async (req: Request, res: Response) => {
   //end status fillters
 
   //date fillters
-  const dataDate:any = {}
-  if(req.query.startDate) {
-    const startDate = moment(String(req.query.startDate)).startOf("date").toDate();
-    dataDate.$gte = startDate;
-  }
-
-  if(req.query.endDate) {
-    const endDate = moment(String(req.query.endDate)).endOf("date").toDate();
-    dataDate.$lte = endDate;
-  }
-
-  find.createdAt = dataDate;
+  find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
   //end date fillters
 
   //Pagination
-  let page = 1;
-  let skip = 0;
-  const limit = 2;
-  const sumDocuments = await Category.countDocuments({});
-  const pages = Math.ceil(sumDocuments / limit);
-
-  if(req.query.page) {
-    let pageNumber = parseInt(String(req.query.page));
-
-    if(pageNumber < page || pageNumber > pages) {
-      pageNumber = page;
-    };
-
-    skip = (pageNumber - 1) * limit;
-  }
+  const sumDocuments = await Category.countDocuments(find);
+  const paginationFeature = managementFeature.pagination(sumDocuments, String(req.query.page));
   //end pagination
 
   const dataFinal = [];
   const record = await Category.find(find).sort({
     position: "desc"
-  }).limit(limit).skip(skip);
+  }).limit(paginationFeature.limit).skip(paginationFeature.skip);
 
   for (const item of record) {
     const rawData = {
