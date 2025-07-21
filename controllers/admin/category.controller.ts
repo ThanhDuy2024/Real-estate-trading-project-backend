@@ -82,10 +82,28 @@ export const categoryList = async (req: Request, res: Response) => {
   find.createdAt = dataDate;
   //end date fillters
 
+  //Pagination
+  let page = 1;
+  let skip = 0;
+  const limit = 2;
+  const sumDocuments = await Category.countDocuments({});
+  const pages = Math.ceil(sumDocuments / limit);
+
+  if(req.query.page) {
+    let pageNumber = parseInt(String(req.query.page));
+
+    if(pageNumber < page || pageNumber > pages) {
+      pageNumber = page;
+    };
+
+    skip = (pageNumber - 1) * limit;
+  }
+  //end pagination
+
   const dataFinal = [];
   const record = await Category.find(find).sort({
     position: "desc"
-  });
+  }).limit(limit).skip(skip);
 
   for (const item of record) {
     const rawData = {
