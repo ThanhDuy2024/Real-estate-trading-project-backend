@@ -241,9 +241,35 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashCategoryList = async (req: accountAdmin, res: Response) => {
-  const record = await Category.find({
-    deleted: true
-  })
+  const find:any = {
+    deleted: false
+  }
+
+  //search cateogry
+  if (req.query.search) {
+    const keyword = slugify(String(req.query.search), {
+      lower: true
+    });
+    find.slug = keyword;
+  }
+  //end search category
+
+  //status fillters
+  if (req.query.status === "active" || req.query.status === "inactive") {
+    find.status = req.query.status;
+  }
+  //end status fillters
+
+  //date fillters
+  find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
+  //end date fillters
+
+  //Pagination
+  const sumDocuments = await Category.countDocuments(find);
+  const paginationFeature = managementFeature.pagination(sumDocuments, String(req.query.page));
+  //end pagination
+
+  const record = await Category.find(find).limit(paginationFeature.limit).skip(paginationFeature.skip);
 
   const dataFinal = [];
 
@@ -275,7 +301,8 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
   }
   res.json({
     code: "success",
-    categories: dataFinal
+    categories: dataFinal,
+    pages: paginationFeature.pages
   });
 }
 
