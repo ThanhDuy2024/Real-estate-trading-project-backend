@@ -58,7 +58,8 @@ export const categoryList = async (req: Request, res: Response) => {
     const keyword = slugify(String(req.query.search), {
       lower: true
     });
-    find.slug = keyword;
+    const regex = new RegExp(keyword);
+    find.slug = regex;
   }
   //end search category
 
@@ -69,12 +70,17 @@ export const categoryList = async (req: Request, res: Response) => {
   //end status fillters
 
   //date fillters
-  find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
+  if(req.query.startDate || req.query.endDate) {
+    find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
+  }
   //end date fillters
 
   //Pagination
-  const sumDocuments = await Category.countDocuments(find);
-  const paginationFeature = managementFeature.pagination(sumDocuments, String(req.query.page));
+   let paginationFeature:any = {}
+  if(req.query.page) {
+    const sumDocuments = await Category.countDocuments(find);
+    paginationFeature = managementFeature.pagination(sumDocuments, String(req.query.page));
+  }
   //end pagination
 
   const dataFinal = [];
