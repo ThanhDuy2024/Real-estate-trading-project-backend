@@ -65,7 +65,6 @@ export const roleList = async (req: Request, res: Response) => {
     const rawData: any = {
       id: item._id,
       name: item.name,
-      permissions: item.permissions,
       status: item.status,
     };
 
