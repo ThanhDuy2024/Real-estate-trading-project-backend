@@ -9,7 +9,7 @@ export const roleValidate = async (req: Request, res: Response, next: NextFuncti
         "string.min": "Name must have at least 4 character!",
         "string.max": "Name must not exceed 50 characters!"
       }),
-    permissions: Joi.string().allow(""),
+    permissions: Joi.allow(""),
     status: Joi.string().required()
       .messages({
         "string.empty": "status must have!"
