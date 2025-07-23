@@ -10,18 +10,18 @@ const upload = multer({
   storage: storage
 })
 
-router.post("/create", upload.single("image"), middleware.accountVerify, validate.categoryValidate, categoryController.categoryCreate);
+router.post("/create", upload.single("image"), validate.categoryValidate, categoryController.categoryCreate);
 
-router.get('/list', middleware.accountVerify, categoryController.categoryList);
+router.get('/list', categoryController.categoryList);
 
-router.patch('/edit/:id', upload.single("image"), middleware.accountVerify, validate.categoryValidate, categoryController.categoryEdit);
+router.patch('/edit/:id', upload.single("image"), validate.categoryValidate, categoryController.categoryEdit);
 
-router.delete('/delete/:id', middleware.accountVerify, categoryController.categoryDelete);
+router.delete('/delete/:id', categoryController.categoryDelete);
 
-router.get('/trash/list', middleware.accountVerify, categoryController.trashCategoryList);
+router.get('/trash/list', categoryController.trashCategoryList);
 
-router.patch('/trash/recovery/:id', middleware.accountVerify, categoryController.trashCategoryRecovery);
+router.patch('/trash/recovery/:id', categoryController.trashCategoryRecovery);
 
-router.delete('/trash/delete/:id', middleware.accountVerify, categoryController.trashCategoryDelete)
+router.delete('/trash/delete/:id', categoryController.trashCategoryDelete);
 
 export default router;
