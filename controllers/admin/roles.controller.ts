@@ -110,3 +110,35 @@ export const roleList = async (req: Request, res: Response) => {
     data: finalData
   })
 }
+
+export const roleDetail = async (req: Request, res: Response) => {
+  try {
+    const record = await Role.findOne({
+      _id: req.params.id,
+      deleted: false
+    });
+
+    if(!record) {
+      res.json({
+        code: "error",
+        message: "item not found"
+      });
+      return;
+    };
+
+    const finalData = {
+      id: record._id,
+      name: record.name,
+      permissions: record.permissions,
+    }
+    res.json({
+      code: "success",
+      message: finalData
+    });
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    });
+  }
+}

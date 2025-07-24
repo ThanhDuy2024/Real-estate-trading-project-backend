@@ -7,4 +7,6 @@ router.post('/create', validate.roleValidate, roleController.roleCreate);
 
 router.get('/list', roleController.roleList);
 
+router.post('/detail/:id', roleController.roleDetail);
+
 export default router;
