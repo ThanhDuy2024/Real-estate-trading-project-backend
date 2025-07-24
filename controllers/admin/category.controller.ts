@@ -232,8 +232,12 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
     }
 
     const record = await Category.find({
+      _id: { $ne:  checkId._id},
       deleted: false
     })
+
+    console.log(record);
+
     if (req.file) {
       req.body.image = req.file.path;
     } else {
