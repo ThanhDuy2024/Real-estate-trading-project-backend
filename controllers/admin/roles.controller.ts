@@ -1,4 +1,4 @@
-import { raw, Request, Response } from "express";
+import { Request, Response } from "express";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import { Role } from "../../models/roles.model";
 import AccountAdmin from "../../models/accountAdmin.model";
@@ -140,5 +140,39 @@ export const roleDetail = async (req: Request, res: Response) => {
       code: "error",
       message: error
     });
+  }
+}
+
+export const roleEdit = async (req: accountAdmin, res: Response) => {
+  try {
+    const check = await Role.findOne({
+      _id: req.params.id,
+      deleted: false
+    });
+
+    if(!check) {
+      res.json({
+        code: "error",
+        message: "item not found"
+      });
+    };
+
+    req.body.updatedBy = req.accountAdmin._id,
+
+    await Role.updateOne({
+      _id: req.params.id,
+      deleted: false
+    }, req.body);
+
+    res.json({
+      code: "success",
+      message: "Role Edit successfully"
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: error
+    })
   }
 }

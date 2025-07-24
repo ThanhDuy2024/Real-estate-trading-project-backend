@@ -9,4 +9,6 @@ router.get('/list', roleController.roleList);
 
 router.post('/detail/:id', roleController.roleDetail);
 
+router.patch('/edit/:id', validate.roleValidate, roleController.roleEdit);
+
 export default router;
