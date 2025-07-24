@@ -49,12 +49,12 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
 };
 
 export const categoryList = async (req: Request, res: Response) => {
-  const find:any = {
+  const find: any = {
     deleted: false
   }
 
   //search cateogry
-  if(req.query.search) {
+  if (req.query.search) {
     const keyword = slugify(String(req.query.search), {
       lower: true
     });
@@ -64,20 +64,20 @@ export const categoryList = async (req: Request, res: Response) => {
   //end search category
 
   //status fillters
-  if(req.query.status === "active" || req.query.status === "inactive") {
+  if (req.query.status === "active" || req.query.status === "inactive") {
     find.status = req.query.status;
   }
   //end status fillters
 
   //date fillters
-  if(req.query.startDate || req.query.endDate) {
+  if (req.query.startDate || req.query.endDate) {
     find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
   }
   //end date fillters
 
   //Pagination
-   let paginationFeature:any = {}
-  if(req.query.page) {
+  let paginationFeature: any = {}
+  if (req.query.page) {
     const sumDocuments = await Category.countDocuments(find);
     paginationFeature = managementFeature.pagination(sumDocuments, String(req.query.page));
   }
@@ -145,6 +145,76 @@ export const categoryList = async (req: Request, res: Response) => {
     data: dataFinal,
     pages: paginationFeature.pages,
   })
+}
+
+export const categoryDetail = async (req: Request, res: Response) => {
+  try {
+    const record = await Category.findOne({
+      _id: req.params.id,
+      deleted: false
+    });
+
+    if (!record) {
+      res.json({
+        code: "error",
+        message: "item not found"
+      });
+      return;
+    };
+
+    const finalData: any = {
+      id: record._id,
+      name: record.name,
+      parentId: record.parentId,
+      note: record.note,
+      image: record.image,
+      position: record.position,
+      status: record.status,
+    };
+
+    if (record.createdBy) {
+      const check = await AccountAdmin.findOne({
+        _id: record.createdBy,
+      })
+
+      if (!check) {
+        finalData.createdByName = "";
+        return;
+      }
+      finalData.createdByName = check.fullName;
+    }
+
+    if (record.updatedBy) {
+      const check = await AccountAdmin.findOne({
+        _id: record.updatedBy,
+      })
+
+      if (!check) {
+        finalData.updatedByName = "";
+        return;
+      }
+      finalData.updatedByName = check.fullName;
+    }
+
+    if(record.createdAt) {
+      finalData.createdAtFormat = moment(record.createdAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    if(record.updatedAt) {
+      finalData.updatedAtFormat = moment(record.updatedAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    res.json({
+      code: "success",
+      data: finalData
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "errror",
+      message: error
+    })
+  }
 }
 
 export const categoryEdit = async (req: accountAdmin, res: Response) => {
@@ -247,7 +317,7 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashCategoryList = async (req: accountAdmin, res: Response) => {
-  const find:any = {
+  const find: any = {
     deleted: false
   }
 
@@ -319,7 +389,7 @@ export const trashCategoryRecovery = async (req: accountAdmin, res: Response) =>
       _id: req.params.id
     });
 
-    if(!check) {
+    if (!check) {
       res.json({
         code: "error"
       });
@@ -351,7 +421,7 @@ export const trashCategoryDelete = async (req: accountAdmin, res: Response) => {
       _id: req.params.id
     });
 
-    if(!check) {
+    if (!check) {
       res.json({
         code: "error"
       });

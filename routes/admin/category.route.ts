@@ -14,6 +14,8 @@ router.post("/create", upload.single("image"), validate.categoryValidate, catego
 
 router.get('/list', categoryController.categoryList);
 
+router.post('/detail/:id', categoryController.categoryDetail);
+
 router.patch('/edit/:id', upload.single("image"), validate.categoryValidate, categoryController.categoryEdit);
 
 router.delete('/delete/:id', categoryController.categoryDelete);
