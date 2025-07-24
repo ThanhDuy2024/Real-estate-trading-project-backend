@@ -176,3 +176,39 @@ export const roleEdit = async (req: accountAdmin, res: Response) => {
     })
   }
 }
+
+export const roleDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const check = await Role.findOne({
+      _id: req.params.id,
+      deleted: false,
+    });
+
+    if(!check) {
+      res.json({
+        code: "error",
+        message: "item not found"
+      });
+      return;
+    }
+
+    await Role.updateOne({
+      _id: check._id,
+      deleted: false
+    }, {
+      deleted: true,
+      deletedAt: Date.now(),
+      deletedBy: req.accountAdmin._id
+    });
+    
+    res.json({
+      code: "success",
+      message: "Role has been deleted"
+    })
+  } catch (error) {
+    res.json({
+      code: "success",
+      message: error
+    })
+  }
+}

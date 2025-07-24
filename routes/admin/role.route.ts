@@ -11,4 +11,6 @@ router.post('/detail/:id', roleController.roleDetail);
 
 router.patch('/edit/:id', validate.roleValidate, roleController.roleEdit);
 
+router.delete('/delete/:id', roleController.roleDelete);
+
 export default router;
