@@ -285,3 +285,35 @@ export const trashRoleRecovery = async (req: accountAdmin, res: Response) => {
     })
   }
 }
+
+export const trashRoleDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const record = await Role.findOne({
+      _id: id,
+      deleted: true
+    });
+
+    if(!record) {
+      res.json({
+        code: "error",
+        message: "item not found"
+      });
+    }
+
+    await Role.deleteOne({
+      _id: record?._id
+    });
+
+    res.json({
+      code: "success",
+      message: "Deleted successfully"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    })
+  }
+}
