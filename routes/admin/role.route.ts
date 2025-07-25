@@ -15,4 +15,6 @@ router.delete('/delete/:id', roleController.roleDelete);
 
 router.get('/trash/list', roleController.trashRoleList);
 
+router.patch('/trash/recovery/:id', roleController.trashRoleRecovery);
+
 export default router;
