@@ -211,4 +211,42 @@ export const roleDelete = async (req: accountAdmin, res: Response) => {
       message: error
     })
   }
+} 
+
+export const trashRoleList = async (req: accountAdmin, res: Response) => {
+  const record = await Role.find({
+    deleted: true
+  });
+
+  const finalData = [];
+  for (const item of record) {
+    const rawData:any = {
+      id: item.id,
+      name: item.name,
+    }
+    
+    if(item.deletedBy) {
+      const check = await AccountAdmin.findOne({
+        _id: item.deletedBy
+      });
+
+      if(!check) {
+        rawData.deleteByName = "";
+        return;
+      };
+
+      rawData.deleteByName = check.fullName;
+    };
+
+    if(item.deletedAt) {
+      rawData.deletedAtFormat = moment(item.deletedAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    finalData.push(rawData);
+
+  }
+  res.json({
+    code: "success",
+    data: finalData
+  });
 }

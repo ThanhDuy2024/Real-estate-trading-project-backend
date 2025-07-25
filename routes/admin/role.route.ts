@@ -13,4 +13,6 @@ router.patch('/edit/:id', validate.roleValidate, roleController.roleEdit);
 
 router.delete('/delete/:id', roleController.roleDelete);
 
+router.get('/trash/list', roleController.trashRoleList);
+
 export default router;
