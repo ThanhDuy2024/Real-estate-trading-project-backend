@@ -6,8 +6,17 @@ import moment from "moment";
 import slugify from "slugify";
 import { dateFillters, pagination } from "../../helpers/managementFeature.helper";
 import { Category } from "../../models/category.model";
+import { rolePermissions } from "../../enums/permission.enum";
 
 export const roleCreate = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.roleCreate)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   req.body.createdBy = req.accountAdmin._id;
   req.body.updatedBy = req.accountAdmin._id;
 
@@ -19,7 +28,15 @@ export const roleCreate = async (req: accountAdmin, res: Response) => {
   });
 }
 
-export const roleList = async (req: Request, res: Response) => {
+export const roleList = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.roleEdit)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   const find: any = {
     deleted: false
   };
@@ -111,14 +128,22 @@ export const roleList = async (req: Request, res: Response) => {
   })
 }
 
-export const roleDetail = async (req: Request, res: Response) => {
+export const roleDetail = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.roleDetail)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const record = await Role.findOne({
       _id: req.params.id,
       deleted: false
     });
 
-    if(!record) {
+    if (!record) {
       res.json({
         code: "error",
         message: "item not found"
@@ -144,13 +169,21 @@ export const roleDetail = async (req: Request, res: Response) => {
 }
 
 export const roleEdit = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.roleEdit)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const check = await Role.findOne({
       _id: req.params.id,
       deleted: false
     });
 
-    if(!check) {
+    if (!check) {
       res.json({
         code: "error",
         message: "item not found"
@@ -159,10 +192,10 @@ export const roleEdit = async (req: accountAdmin, res: Response) => {
 
     req.body.updatedBy = req.accountAdmin._id,
 
-    await Role.updateOne({
-      _id: req.params.id,
-      deleted: false
-    }, req.body);
+      await Role.updateOne({
+        _id: req.params.id,
+        deleted: false
+      }, req.body);
 
     res.json({
       code: "success",
@@ -178,13 +211,21 @@ export const roleEdit = async (req: accountAdmin, res: Response) => {
 }
 
 export const roleDelete = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.roleDelete)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const check = await Role.findOne({
       _id: req.params.id,
       deleted: false,
     });
 
-    if(!check) {
+    if (!check) {
       res.json({
         code: "error",
         message: "item not found"
@@ -200,7 +241,7 @@ export const roleDelete = async (req: accountAdmin, res: Response) => {
       deletedAt: Date.now(),
       deletedBy: req.accountAdmin._id
     });
-    
+
     res.json({
       code: "success",
       message: "Role has been deleted"
@@ -211,26 +252,34 @@ export const roleDelete = async (req: accountAdmin, res: Response) => {
       message: error
     })
   }
-} 
+}
 
 export const trashRoleList = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.trashRoleList)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   const record = await Role.find({
     deleted: true
   });
 
   const finalData = [];
   for (const item of record) {
-    const rawData:any = {
+    const rawData: any = {
       id: item.id,
       name: item.name,
     }
-    
-    if(item.deletedBy) {
+
+    if (item.deletedBy) {
       const check = await AccountAdmin.findOne({
         _id: item.deletedBy
       });
 
-      if(!check) {
+      if (!check) {
         rawData.deleteByName = "";
         return;
       };
@@ -238,7 +287,7 @@ export const trashRoleList = async (req: accountAdmin, res: Response) => {
       rawData.deleteByName = check.fullName;
     };
 
-    if(item.deletedAt) {
+    if (item.deletedAt) {
       rawData.deletedAtFormat = moment(item.deletedAt).format("HH:mm DD/MM/YYYY");
     }
 
@@ -252,6 +301,14 @@ export const trashRoleList = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashRoleRecovery = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.trashRoleRecovery)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const id = req.params.id;
 
@@ -260,7 +317,7 @@ export const trashRoleRecovery = async (req: accountAdmin, res: Response) => {
       deleted: true,
     });
 
-    if(!record) {
+    if (!record) {
       res.json({
         code: "error",
         message: "item not found",
@@ -287,6 +344,14 @@ export const trashRoleRecovery = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashRoleDelete = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(rolePermissions.roleDelete)) {
+    res.json({
+      code: "error",
+      message: "you not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const id = req.params.id;
 
@@ -295,7 +360,7 @@ export const trashRoleDelete = async (req: accountAdmin, res: Response) => {
       deleted: true
     });
 
-    if(!record) {
+    if (!record) {
       res.json({
         code: "error",
         message: "item not found"
