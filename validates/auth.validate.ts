@@ -75,6 +75,11 @@ export const profileValidate = (req: Request, res: Response, next: NextFunction)
         "string.min": "full name must be at least 6 characters",
         "string.max": "full name must be at highest 50 characters"
       }),
+    email: Joi.string().email()
+      .messages({
+        "string.empty": "your email is empty",
+        "string.email": "syntax email error"
+      }),
     avatar: Joi.string().allow(""),
     phone: Joi.string().allow(""),
     address: Joi.string().allow(""),
