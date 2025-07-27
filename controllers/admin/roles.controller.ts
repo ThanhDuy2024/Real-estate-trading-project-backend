@@ -6,7 +6,7 @@ import moment from "moment";
 import slugify from "slugify";
 import { dateFillters, pagination } from "../../helpers/managementFeature.helper";
 import { Category } from "../../models/category.model";
-import { rolePermissions } from "../../enums/permission.enum";
+import { rolePermissions, categoryPermissions } from "../../enums/permission.enum";
 
 export const roleCreate = async (req: accountAdmin, res: Response) => {
   if (!req.accountAdmin.permissions.includes(rolePermissions.roleCreate)) {
@@ -16,6 +16,27 @@ export const roleCreate = async (req: accountAdmin, res: Response) => {
     });
     return;
   };
+
+  //check permisson role co ton tai hay khong
+  const permissionsArray: any = []
+  permissionsArray.push(...Object.values(rolePermissions));
+  permissionsArray.push(...Object.values(categoryPermissions));
+
+  let check = "ok"
+  req.body.permissions.forEach((item: any) => {
+    if (!permissionsArray.includes(item)) {
+      check = "not ok";
+      return;
+    };
+  });
+
+  if (check === "not ok") {
+    res.json({
+      code: "error"
+    });
+    return;
+  }
+  //end check permission role exited
 
   req.body.createdBy = req.accountAdmin._id;
   req.body.updatedBy = req.accountAdmin._id;
@@ -189,6 +210,27 @@ export const roleEdit = async (req: accountAdmin, res: Response) => {
         message: "item not found"
       });
     };
+
+    //check permissions role co ton tai trong he trong hay khong
+    const permissionsArray: any = []
+    permissionsArray.push(...Object.values(rolePermissions));
+    permissionsArray.push(...Object.values(categoryPermissions));
+
+    let checkOut = "ok"
+    req.body.permissions.forEach((item: any) => {
+      if (!permissionsArray.includes(item)) {
+        checkOut = "not ok";
+        return;
+      };
+    });
+
+    if (checkOut === "not ok") {
+      res.json({
+        code: "error"
+      });
+      return;
+    };
+    //end check permissions role co ton tai trong he trong hay khong
 
     req.body.updatedBy = req.accountAdmin._id,
 
