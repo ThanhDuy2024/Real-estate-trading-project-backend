@@ -3,12 +3,23 @@ import { Category } from "../../models/category.model";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
 import * as managementFeature from "../../helpers/managementFeature.helper"
+import { categoryPermissions } from "../../enums/permission.enum"
 import moment from "moment";
 import slugify from "slugify";
+
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.categoryCreate)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  }
+
   const record = await Category.find({
     deleted: false,
   })
+
   if (req.file) {
     req.body.image = req.file.path;
   } else {
@@ -48,7 +59,15 @@ export const categoryCreate = async (req: accountAdmin, res: Response) => {
   });
 };
 
-export const categoryList = async (req: Request, res: Response) => {
+export const categoryList = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.categoryList)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  };
+
   const find: any = {
     deleted: false
   }
@@ -147,7 +166,15 @@ export const categoryList = async (req: Request, res: Response) => {
   })
 }
 
-export const categoryDetail = async (req: Request, res: Response) => {
+export const categoryDetail = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.categoryDetail)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  }
+
   try {
     const record = await Category.findOne({
       _id: req.params.id,
@@ -196,11 +223,11 @@ export const categoryDetail = async (req: Request, res: Response) => {
       finalData.updatedByName = check.fullName;
     }
 
-    if(record.createdAt) {
+    if (record.createdAt) {
       finalData.createdAtFormat = moment(record.createdAt).format("HH:mm DD/MM/YYYY");
     }
 
-    if(record.updatedAt) {
+    if (record.updatedAt) {
       finalData.updatedAtFormat = moment(record.updatedAt).format("HH:mm DD/MM/YYYY");
     }
 
@@ -218,6 +245,14 @@ export const categoryDetail = async (req: Request, res: Response) => {
 }
 
 export const categoryEdit = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.categoryEdit)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const checkId = await Category.findOne({
       _id: req.params.id,
@@ -232,7 +267,7 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
     }
 
     const record = await Category.find({
-      _id: { $ne:  checkId._id},
+      _id: { $ne: checkId._id },
       deleted: false
     })
 
@@ -286,6 +321,14 @@ export const categoryEdit = async (req: accountAdmin, res: Response) => {
 }
 
 export const categoryDelete = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.categoryDelete)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const record = await Category.findOne({
       deleted: false,
@@ -321,6 +364,14 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashCategoryList = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.trashCategoryList)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  };
+
   const find: any = {
     deleted: false
   }
@@ -387,6 +438,14 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashCategoryRecovery = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.trashCategoryRecovery)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  };
+
   try {
     const check = await Category.findOne({
       deleted: true,
@@ -419,6 +478,13 @@ export const trashCategoryRecovery = async (req: accountAdmin, res: Response) =>
 }
 
 export const trashCategoryDelete = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(categoryPermissions.trashCategoryDelete)) {
+    res.json({
+      code: "error",
+      message: "you are not permission in feature!"
+    });
+    return;
+  }
   try {
     const check = await Category.findOne({
       deleted: true,
