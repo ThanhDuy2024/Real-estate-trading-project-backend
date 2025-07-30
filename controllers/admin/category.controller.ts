@@ -6,6 +6,7 @@ import * as managementFeature from "../../helpers/managementFeature.helper"
 import { categoryPermissions } from "../../enums/permission.enum"
 import moment from "moment";
 import slugify from "slugify";
+import Building from "../../models/building.model";
 
 export const categoryCreate = async (req: accountAdmin, res: Response) => {
   if (!req.accountAdmin.permissions.includes(categoryPermissions.categoryCreate)) {
@@ -392,7 +393,7 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
   //end status fillters
 
   //date fillters
-  if(req.query.startDate || req.query.endDate) {
+  if (req.query.startDate || req.query.endDate) {
     find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
   }
   //end date fillters
@@ -404,7 +405,7 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
 
   const record = await Category.find(find).limit(paginationFeature.limit).skip(paginationFeature.skip);
 
-  if(!record) {
+  if (!record) {
     res.json({
       code: "error",
       message: "Categories not found!"
@@ -507,6 +508,26 @@ export const trashCategoryDelete = async (req: accountAdmin, res: Response) => {
       });
       return;
     };
+
+    //building category update
+    const building = await Building.find({
+      categoryId: check._id,
+    });
+
+    const dataId = [];
+    
+    if (building) {
+      for (const item of building) {
+        dataId.push(item._id);
+      }
+
+      await Building.updateMany({
+        _id: { $in: dataId }
+      }, {
+        categoryId: ""
+      })
+    }
+    //end building category update
 
     await Category.deleteOne({
       _id: check.id
