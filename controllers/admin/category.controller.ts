@@ -373,7 +373,7 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
   };
 
   const find: any = {
-    deleted: false
+    deleted: true
   }
 
   //search cateogry
@@ -392,7 +392,9 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
   //end status fillters
 
   //date fillters
-  find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
+  if(req.query.startDate || req.query.endDate) {
+    find.createdAt = managementFeature.dateFillters(String(req.query.startDate), String(req.query.endDate));
+  }
   //end date fillters
 
   //Pagination
@@ -401,6 +403,14 @@ export const trashCategoryList = async (req: accountAdmin, res: Response) => {
   //end pagination
 
   const record = await Category.find(find).limit(paginationFeature.limit).skip(paginationFeature.skip);
+
+  if(!record) {
+    res.json({
+      code: "error",
+      message: "Categories not found!"
+    });
+    return;
+  }
 
   const dataFinal = [];
 
