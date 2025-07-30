@@ -23,6 +23,14 @@ export const buildingCreate = async (req: accountAdmin, res: Response) => {
     return;
   };
 
+  if(!req.body.rentPrice && !req.body.purchasePrice) {
+    res.json({
+      code: "error",
+      message: "The rent price or purchase price is empty"
+    });
+    return;
+  } 
+
   if(req.body.numberOfFloors) {
     req.body.numberOfFloors = parseInt(req.body.numberOfFloors);
   };
