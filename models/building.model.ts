@@ -8,7 +8,7 @@ const schema = new Schema({
   avatar: String,
   address: String,
   categoryId: String,
-  acreage: Number, //dien tich
+  acreage: String, //dien tich
   numberOfFloors: Number, //so tang cua can nha
   rentPrice: Number,
   purchasePrice: Number, 
