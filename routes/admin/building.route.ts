@@ -11,4 +11,6 @@ const upload = multer({
 
 router.post("/create", upload.single("avatar"), validate.buildingValidate,  buildingController.buildingCreate);
 
+router.get("/list", buildingController.buildingList);
+
 export default router;
