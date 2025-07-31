@@ -28,6 +28,10 @@ export const buildingValidate = (req: Request, res: Response, next: NextFunction
     status: Joi.string().required()
       .messages({
         "string.empty": "The building status is empty"
+      }),
+    manager: Joi.string().required()
+      .messages({
+        "string.empty": "The building's is empty"
       })
   })
 

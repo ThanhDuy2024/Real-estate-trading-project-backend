@@ -12,6 +12,7 @@ const schema = new Schema({
   numberOfFloors: Number, //so tang cua can nha
   rentPrice: Number,
   purchasePrice: Number, 
+  manager: String,
   status: String,
   deleted: {
     type: Boolean,
