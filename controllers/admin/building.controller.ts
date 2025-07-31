@@ -74,6 +74,7 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
     if (item.createdBy) {
       const account = await AccountAdmin.findOne({
         _id: item.createdBy,
+        deleted: false
       });
 
       if (!account) {
@@ -87,6 +88,7 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
     if (item.updatedBy) {
       const account = await AccountAdmin.findOne({
         _id: item.updatedBy,
+        deletd: false,
       });
 
       if (!account) {
@@ -111,4 +113,46 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
     code: "success",
     message: finalData,
   })
+}
+
+export const buildingDetail = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    const record = await Building.findOne({
+      _id: id,
+      deleted: false,
+    });
+
+    if(!record) {
+      res.json({
+        code: "error",
+        message: "Item not found!"
+      });
+      return;
+    }
+
+    const finalData:any = {
+      id: record?._id,
+      name: record.name,
+      avatar: record.avatar,
+      address: record.address,
+      arceage: record.acreage,
+      numberOfFloors: record.numberOfFloors,
+      rentPrice: record.rentPrice,
+      purchasePrice: record.purchasePrice,
+      status: record.status,
+      categoryId: record.categoryId,
+      manager: record.manager,
+    }
+
+    res.json({
+      code: "success",
+      message: finalData
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    })
+  }
 }

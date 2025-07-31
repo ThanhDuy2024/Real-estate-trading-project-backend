@@ -13,4 +13,6 @@ router.post("/create", upload.single("avatar"), validate.buildingValidate,  buil
 
 router.get("/list", buildingController.buildingList);
 
+router.post("/detail/:id", buildingController.buildingDetail);
+
 export default router;

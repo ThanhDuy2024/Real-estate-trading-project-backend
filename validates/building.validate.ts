@@ -29,10 +29,7 @@ export const buildingValidate = (req: Request, res: Response, next: NextFunction
       .messages({
         "string.empty": "The building status is empty"
       }),
-    manager: Joi.string().required()
-      .messages({
-        "string.empty": "The building's is empty"
-      })
+    manager: Joi.allow(""),
   })
 
   const { error } = schema.validate(req.body);

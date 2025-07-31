@@ -343,6 +343,27 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
       return;
     };
 
+    //building category update
+    const building = await Building.find({
+      categoryId: record._id,
+    });
+
+    const dataId = [];
+
+    if (building) {
+      for (const item of building) {
+        dataId.push(item._id);
+      }
+
+      await Building.updateMany({
+        _id: { $in: dataId }
+      }, {
+        categoryId: "",
+        updatedBy: req.accountAdmin._id,
+      })
+    }
+    //end building category update
+
     await Category.updateOne({
       _id: req.params.id,
     }, {
@@ -508,26 +529,6 @@ export const trashCategoryDelete = async (req: accountAdmin, res: Response) => {
       });
       return;
     };
-
-    //building category update
-    const building = await Building.find({
-      categoryId: check._id,
-    });
-
-    const dataId = [];
-    
-    if (building) {
-      for (const item of building) {
-        dataId.push(item._id);
-      }
-
-      await Building.updateMany({
-        _id: { $in: dataId }
-      }, {
-        categoryId: ""
-      })
-    }
-    //end building category update
 
     await Category.deleteOne({
       _id: check.id
