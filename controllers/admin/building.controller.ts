@@ -134,15 +134,15 @@ export const buildingDetail = async (req: accountAdmin, res: Response) => {
     const finalData:any = {
       id: record?._id,
       name: record.name,
-      avatar: record.avatar,
+      avatar: record.avatar ? record.avatar : "",
       address: record.address,
       arceage: record.acreage,
-      numberOfFloors: record.numberOfFloors,
-      rentPrice: record.rentPrice,
-      purchasePrice: record.purchasePrice,
+      numberOfFloors: record.numberOfFloors ? record.numberOfFloors : "",
+      rentPrice: record.rentPrice ? record.rentPrice : "",
+      purchasePrice: record.purchasePrice ? record.purchasePrice : "",
       status: record.status,
       categoryId: record.categoryId,
-      manager: record.manager,
+      manager: record.manager ? record.manager : "",
     }
 
     res.json({

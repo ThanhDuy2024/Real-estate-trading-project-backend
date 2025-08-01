@@ -364,6 +364,29 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
     }
     //end building category update
 
+    //category update
+    const category = await Category.find({
+      parentId: record.id
+    });
+
+    if(category) {
+      for (const item of category) {
+        const arrayData:any = [];
+        item.parentId.forEach((id:any) => {
+          if(id && id != record.id) {
+            arrayData.push(id);
+          }
+        })
+        await Category.updateOne({
+          _id: item.id
+        }, {
+          parentId: arrayData,
+          updatedBy: req.accountAdmin._id
+        })
+      }
+    }
+    //end category update
+
     await Category.updateOne({
       _id: req.params.id,
     }, {
