@@ -156,3 +156,63 @@ export const buildingDetail = async (req: accountAdmin, res: Response) => {
     })
   }
 }
+
+export const buildingEdit = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    if(req.file) {
+      req.body.avatar = req.file.path;
+    } else {
+      delete req.body.avatar;
+    }
+
+    const building = await Building.findOne({
+      _id: id,
+      deleted: false
+    });
+
+    if(!building) {
+      res.json({
+        code: "error",
+        message: "The building is not found!"
+      });
+      return;
+    }
+
+    if(!req.body.rentPrice && !req.body.purchasePrice) {
+      res.json({
+        code: "error",
+        message: "The rent price or the purchase price is empty!"
+      });
+      return;
+    }
+
+    if(req.body.rentPrice) {
+      req.body.rentPrice = parseInt(req.body.rentPrice);
+    }
+
+    if(req.body.purchase) {
+      req.body.purchasePrice = parseInt(req.body.purchasePrice)
+    }
+
+    if(req.body.numberOfFloors) {
+      req.body.numberOfFloors = parseInt(req.body.numberOfFloors);
+    }
+
+    req.body.updatedBy = req.accountAdmin._id;
+
+    await Building.updateOne({
+      _id: id
+    }, req.body);
+
+    res.json({
+      code: "success",
+      message: "The building has been edited!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    })
+  }
+}

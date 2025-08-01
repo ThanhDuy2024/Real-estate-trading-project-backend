@@ -15,4 +15,5 @@ router.get("/list", buildingController.buildingList);
 
 router.post("/detail/:id", buildingController.buildingDetail);
 
+router.patch("/edit/:id", upload.single("avatar"), validate.buildingValidate, buildingController.buildingEdit);
 export default router;
