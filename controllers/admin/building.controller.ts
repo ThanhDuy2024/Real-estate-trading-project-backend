@@ -1,10 +1,12 @@
-import { Response } from "express";
+import { raw, Response } from "express";
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import { Category } from "../../models/category.model";
 import Building from "../../models/building.model";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
 import { date } from "joi";
+import slugify from "slugify";
+import { dateFillters, pagination } from "../../helpers/managementFeature.helper";
 
 export const buildingCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
@@ -60,12 +62,91 @@ export const buildingCreate = async (req: accountAdmin, res: Response) => {
 
 export const buildingList = async (req: accountAdmin, res: Response) => {
   try {
-    const record = await Building.find({
+    const find:any = {
       deleted: false
-    });
+    }
+
+    //search 
+    if(req.query.search) {
+      const keyword = slugify(String(req.query.search), {
+        lower: true
+      });
+      const regex = new RegExp(keyword);
+
+      find.slug = regex;
+    }
+    //end search
+
+    //status
+    if(req.query.status) {
+      find.status = req.query.status;
+    }
+    //end status
+
+    //date
+    if(req.query.startDate || req.query.endDate) {
+      find.createdAt = dateFillters(String(req.query.startDate), String(req.query.endDate));
+    }
+    //end date
+
+    //pagination 
+    const sumDocuments = await Building.countDocuments(find);
+    let page = "1";
+    if(req.query.page) {
+      page = String(req.query.page);
+    }
+    const paginations = pagination(sumDocuments, page);
+    //end pagination
+    const record = await Building.find(find).skip(paginations.skip).limit(paginations.limit)
+      .sort({
+        createdAt: "desc"
+      });
+
+    const finalData = [];
+
+    for (const item of record) {
+      const rawData: any = {
+        id: item.id,
+        name: item.name,
+        avatar: item.avatar,
+      }
+
+      if (item.updatedBy) {
+        const check = await AccountAdmin.findOne({
+          _id: item.updatedBy
+        });
+
+        if (!check) {
+          rawData.updatedByName = "";
+        } else {
+          rawData.updatedByName = check.fullName;
+        }
+      }
+
+      if (item.createdBy) {
+        const check = await AccountAdmin.findOne({
+          _id: item.createdBy
+        });
+
+        if (!check) {
+          rawData.createdByName = "";
+        } else {
+          rawData.createdByName = check.fullName;
+        }
+      }
+
+      if(item.updatedAt) {
+        rawData.updatedAtFormat = moment(item.updatedAt).format("HH:mm DD/MM/YYYY");
+      }
+
+      if(item.createdAt) {
+        rawData.createdAtFormat = moment(item.createdAt).format("HH:mm DD/MM/YYYY");
+      }
+      finalData.push(rawData);
+    }
     res.json({
       code: "success",
-      data: record
+      data: finalData,
     })
   } catch (error) {
     console.log(error);
