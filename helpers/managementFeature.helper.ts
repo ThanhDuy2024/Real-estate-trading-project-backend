@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const pagination = (sumDocuments: number, queryPage: string) => {
+export const pagination = (sumDocuments: number, queryPage: string = "1") => {
   let skip = 0;
   const page = 1;
   const limit = 2;

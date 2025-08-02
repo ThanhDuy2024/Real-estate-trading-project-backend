@@ -14,6 +14,10 @@ const schema = new Schema({
   purchasePrice: Number, 
   manager: String,
   status: String,
+  slug: {
+    type: String,
+    slug: "name"
+  },
   deleted: {
     type: Boolean,
     default: false,
