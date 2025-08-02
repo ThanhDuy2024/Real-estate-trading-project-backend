@@ -4,6 +4,7 @@ import { Category } from "../../models/category.model";
 import Building from "../../models/building.model";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
+import { date } from "joi";
 
 export const buildingCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
@@ -58,61 +59,20 @@ export const buildingCreate = async (req: accountAdmin, res: Response) => {
 }
 
 export const buildingList = async (req: accountAdmin, res: Response) => {
-  const record = await Building.find({
-    deleted: false
-  });
-
-  const finalData = [];
-  for (const item of record) {
-    const rawData: any = {
-      id: item._id,
-      name: item.name,
-      avatar: item.avatar,
-      status: item.status,
-    };
-
-    if (item.createdBy) {
-      const account = await AccountAdmin.findOne({
-        _id: item.createdBy,
-        deleted: false
-      });
-
-      if (!account) {
-        rawData.createdByName = "";
-        return;
-      };
-
-      rawData.createdByName = account.fullName;
-    }
-
-    if (item.updatedBy) {
-      const account = await AccountAdmin.findOne({
-        _id: item.updatedBy,
-        deletd: false,
-      });
-
-      if (!account) {
-        rawData.updatedByName = "";
-        return;
-      };
-
-      rawData.updatedByName = account.fullName;
-    }
-
-    if(item.createdAt) {
-      rawData.createdAtFormat = moment(item.createdAt).format("HH:mm DD/MM/YYYY");
-    };
-
-    if(item.updatedAt) {
-      rawData.updatedAtFormat = moment(item.updatedAt).format("HH:mm DD/MM/YYYY");
-    }
-
-    finalData.push(rawData);
+  try {
+    const record = await Building.find({
+      deleted: false
+    });
+    res.json({
+      code: "success",
+      data: record
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error"
+    })
   }
-  res.json({
-    code: "success",
-    message: finalData,
-  })
 }
 
 export const buildingDetail = async (req: accountAdmin, res: Response) => {
@@ -123,7 +83,7 @@ export const buildingDetail = async (req: accountAdmin, res: Response) => {
       deleted: false,
     });
 
-    if(!record) {
+    if (!record) {
       res.json({
         code: "error",
         message: "Item not found!"
@@ -131,7 +91,7 @@ export const buildingDetail = async (req: accountAdmin, res: Response) => {
       return;
     }
 
-    const finalData:any = {
+    const finalData: any = {
       id: record?._id,
       name: record.name,
       avatar: record.avatar ? record.avatar : "",
@@ -160,7 +120,7 @@ export const buildingDetail = async (req: accountAdmin, res: Response) => {
 export const buildingEdit = async (req: accountAdmin, res: Response) => {
   try {
     const id = req.params.id;
-    if(req.file) {
+    if (req.file) {
       req.body.avatar = req.file.path;
     } else {
       delete req.body.avatar;
@@ -171,7 +131,7 @@ export const buildingEdit = async (req: accountAdmin, res: Response) => {
       deleted: false
     });
 
-    if(!building) {
+    if (!building) {
       res.json({
         code: "error",
         message: "The building is not found!"
@@ -179,7 +139,7 @@ export const buildingEdit = async (req: accountAdmin, res: Response) => {
       return;
     }
 
-    if(!req.body.rentPrice && !req.body.purchasePrice) {
+    if (!req.body.rentPrice && !req.body.purchasePrice) {
       res.json({
         code: "error",
         message: "The rent price or the purchase price is empty!"
@@ -187,15 +147,15 @@ export const buildingEdit = async (req: accountAdmin, res: Response) => {
       return;
     }
 
-    if(req.body.rentPrice) {
+    if (req.body.rentPrice) {
       req.body.rentPrice = parseInt(req.body.rentPrice);
     }
 
-    if(req.body.purchase) {
+    if (req.body.purchase) {
       req.body.purchasePrice = parseInt(req.body.purchasePrice)
     }
 
-    if(req.body.numberOfFloors) {
+    if (req.body.numberOfFloors) {
       req.body.numberOfFloors = parseInt(req.body.numberOfFloors);
     }
 
@@ -208,6 +168,43 @@ export const buildingEdit = async (req: accountAdmin, res: Response) => {
     res.json({
       code: "success",
       message: "The building has been edited!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    })
+  }
+}
+
+export const buildingDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const building = await Building.findOne({
+      _id: id,
+      deleted: false
+    });
+
+    if (!building) {
+      res.json({
+        code: "error",
+        message: "The building not found!"
+      });
+      return;
+    }
+
+    await Building.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedBy: req.accountAdmin._id,
+      deletedAt: Date.now()
+    });
+
+    res.json({
+      code: "success",
+      message: "The building has been deleted!"
     })
   } catch (error) {
     res.json({
