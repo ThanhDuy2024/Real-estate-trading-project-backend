@@ -96,11 +96,12 @@ export const categoryList = async (req: accountAdmin, res: Response) => {
   //end date fillters
 
   //Pagination
-  let paginationFeature: any = {}
+  const sumDocuments = await Category.countDocuments(find);
+  let page = "1"
   if (req.query.page) {
-    const sumDocuments = await Category.countDocuments(find);
-    paginationFeature = managementFeature.pagination(sumDocuments, String(req.query.page));
+    page = String(req.query.page);
   }
+  const paginationFeature = managementFeature.pagination(sumDocuments, page);
   //end pagination
 
   const dataFinal = [];
@@ -369,11 +370,11 @@ export const categoryDelete = async (req: accountAdmin, res: Response) => {
       parentId: record.id
     });
 
-    if(category) {
+    if (category) {
       for (const item of category) {
-        const arrayData:any = [];
-        item.parentId.forEach((id:any) => {
-          if(id && id != record.id) {
+        const arrayData: any = [];
+        item.parentId.forEach((id: any) => {
+          if (id && id != record.id) {
             arrayData.push(id);
           }
         })

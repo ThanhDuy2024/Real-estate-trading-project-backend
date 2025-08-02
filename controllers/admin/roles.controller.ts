@@ -85,11 +85,12 @@ export const roleList = async (req: accountAdmin, res: Response) => {
   //end date filters
 
   //Pagination
-  let paginationFeature: any = {}
+  const sumDocuments = await Role.countDocuments(find);
+  let page = "1"
   if (req.query.page) {
-    const sumDocuments = await Category.countDocuments(find);
-    paginationFeature = pagination(sumDocuments, String(req.query.page));
+    page = String(req.query.page);
   }
+  const paginationFeature = pagination(sumDocuments, page);
   //end pagination
 
   const record = await Role.find(find).limit(paginationFeature.limit).skip(paginationFeature.skip)
