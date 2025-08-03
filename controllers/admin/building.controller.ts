@@ -4,7 +4,6 @@ import { Category } from "../../models/category.model";
 import Building from "../../models/building.model";
 import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
-import { date } from "joi";
 import slugify from "slugify";
 import { dateFillters, pagination } from "../../helpers/managementFeature.helper";
 
@@ -293,4 +292,43 @@ export const buildingDelete = async (req: accountAdmin, res: Response) => {
       message: error
     })
   }
+}
+
+export const trashBuildingList = async (req: accountAdmin, res: Response) => {
+  const building = await Building.find({
+    deleted: true,
+  });
+
+  const finalData = [];
+  for (const item of building) {
+    const rawData:any = {
+      id: item.id,
+      name: item.name,
+      avatar: item.avatar,
+    }
+
+    if(item.deletedBy) {
+      const account = await AccountAdmin.findOne({
+        _id: item.deletedBy,
+        deleted: false
+      });
+      
+      if(!account) {
+        rawData.deletedByName = "";
+        return;
+      } else {
+        rawData.deletedByName = account.fullName;
+      }
+    }
+
+    if(item.deletedAt) {
+      rawData.deletedAtFormat = moment(item.deletedAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    finalData.push(rawData);
+  }
+  res.json({
+    code: "success",
+    data: finalData,
+  })
 }

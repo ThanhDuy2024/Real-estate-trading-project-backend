@@ -18,4 +18,6 @@ router.post("/detail/:id", buildingController.buildingDetail);
 router.patch("/edit/:id", upload.single("avatar"), validate.buildingValidate, buildingController.buildingEdit);
 
 router.delete("/delete/:id", buildingController.buildingDelete);
+
+router.get("/trash/list", buildingController.trashBuildingList);
 export default router;
