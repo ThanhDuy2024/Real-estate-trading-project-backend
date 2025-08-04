@@ -61,12 +61,12 @@ export const buildingCreate = async (req: accountAdmin, res: Response) => {
 
 export const buildingList = async (req: accountAdmin, res: Response) => {
   try {
-    const find:any = {
+    const find: any = {
       deleted: false
     }
 
     //search 
-    if(req.query.search) {
+    if (req.query.search) {
       const keyword = slugify(String(req.query.search), {
         lower: true
       });
@@ -77,13 +77,13 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
     //end search
 
     //status
-    if(req.query.status) {
+    if (req.query.status) {
       find.status = req.query.status;
     }
     //end status
 
     //date
-    if(req.query.startDate || req.query.endDate) {
+    if (req.query.startDate || req.query.endDate) {
       find.createdAt = dateFillters(String(req.query.startDate), String(req.query.endDate));
     }
     //end date
@@ -91,7 +91,7 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
     //pagination 
     const sumDocuments = await Building.countDocuments(find);
     let page = "1";
-    if(req.query.page) {
+    if (req.query.page) {
       page = String(req.query.page);
     }
     const paginations = pagination(sumDocuments, page);
@@ -134,11 +134,11 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
         }
       }
 
-      if(item.updatedAt) {
+      if (item.updatedAt) {
         rawData.updatedAtFormat = moment(item.updatedAt).format("HH:mm DD/MM/YYYY");
       }
 
-      if(item.createdAt) {
+      if (item.createdAt) {
         rawData.createdAtFormat = moment(item.createdAt).format("HH:mm DD/MM/YYYY");
       }
       finalData.push(rawData);
@@ -146,6 +146,7 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
     res.json({
       code: "success",
       data: finalData,
+      pages: paginations.pages
     })
   } catch (error) {
     console.log(error);
@@ -295,25 +296,51 @@ export const buildingDelete = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashBuildingList = async (req: accountAdmin, res: Response) => {
-  const building = await Building.find({
-    deleted: true,
-  });
+
+  const find: any = {
+    deleted: true
+  }
+
+  //search
+  if (req.query.search) {
+    const keyword = slugify(String(req.query.search), {
+      lower: true
+    });
+
+    const regex = new RegExp(keyword);
+
+    find.slug = regex;
+  }
+  //end search
+
+  //pagination 
+  const sumDocuments = await Building.countDocuments(find);
+  let page = "1";
+  if (req.query.page) {
+    page = String(req.query.page);
+  }
+  const paginations = pagination(sumDocuments, page);
+  //end pagination
+  const building = await Building.find(find).sort({
+    deletedAt: "desc"
+  }).skip(paginations.skip).limit(paginations.skip);
+
 
   const finalData = [];
   for (const item of building) {
-    const rawData:any = {
+    const rawData: any = {
       id: item.id,
       name: item.name,
       avatar: item.avatar,
     }
 
-    if(item.deletedBy) {
+    if (item.deletedBy) {
       const account = await AccountAdmin.findOne({
         _id: item.deletedBy,
         deleted: false
       });
-      
-      if(!account) {
+
+      if (!account) {
         rawData.deletedByName = "";
         return;
       } else {
@@ -321,7 +348,7 @@ export const trashBuildingList = async (req: accountAdmin, res: Response) => {
       }
     }
 
-    if(item.deletedAt) {
+    if (item.deletedAt) {
       rawData.deletedAtFormat = moment(item.deletedAt).format("HH:mm DD/MM/YYYY");
     }
 
@@ -330,5 +357,6 @@ export const trashBuildingList = async (req: accountAdmin, res: Response) => {
   res.json({
     code: "success",
     data: finalData,
+    pages: paginations.pages
   })
 }
