@@ -22,4 +22,6 @@ router.delete("/delete/:id", buildingController.buildingDelete);
 router.get("/trash/list", buildingController.trashBuildingList);
 
 router.patch("/trash/recovery/:id", buildingController.trashBuildingRecovery);
+
+router.delete("/trash/delete/:id", buildingController.trashBuildingDelete);
 export default router;
