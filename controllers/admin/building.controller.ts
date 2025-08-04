@@ -360,3 +360,40 @@ export const trashBuildingList = async (req: accountAdmin, res: Response) => {
     pages: paginations.pages
   })
 }
+
+export const trashBuildingRecovery = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const building = await Building.findOne({
+      _id: id,
+      deleted: true
+    });
+
+    if(!building) {
+      res.json({
+        code: "error",
+        message: "The building is not found"
+      });
+      return;
+    }
+
+    await Building.updateOne({
+      _id: id
+    }, {
+      deleted: false,
+      updateBy: req.accountAdmin._id,
+      updatedAt: Date.now(),
+    });
+    
+    res.json({
+      code: "success",
+      message: "The building is recovery"
+    });
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    })
+  }
+}

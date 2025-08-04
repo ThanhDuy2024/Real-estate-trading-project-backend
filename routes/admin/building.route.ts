@@ -20,4 +20,6 @@ router.patch("/edit/:id", upload.single("avatar"), validate.buildingValidate, bu
 router.delete("/delete/:id", buildingController.buildingDelete);
 
 router.get("/trash/list", buildingController.trashBuildingList);
+
+router.patch("/trash/recovery/:id", buildingController.trashBuildingRecovery);
 export default router;
