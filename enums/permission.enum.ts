@@ -19,3 +19,14 @@ export enum rolePermissions {
   trashRoleRecovery = "trash-role-recovery",
   trashRoleDelete = "trash-role-delete",
 };
+
+export enum buildingPermissions {
+  buildingCreate = "building-create",
+  buildingEdit = "building-edit",
+  buildingList = "building-list",
+  buildingDetail = "building-detail",
+  buildingDelete = "building-delete",
+  trashBuildingList = "trash-building-list",
+  trashBuildingRecovery = "trash-building-recovery",
+  trashBuildingDelete = "trash-building-delete"
+}

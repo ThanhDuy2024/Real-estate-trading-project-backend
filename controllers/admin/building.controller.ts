@@ -3,11 +3,20 @@ import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import { Category } from "../../models/category.model";
 import Building from "../../models/building.model";
 import AccountAdmin from "../../models/accountAdmin.model";
+import { buildingPermissions } from "../../enums/permission.enum";
 import moment from "moment";
 import slugify from "slugify";
 import { dateFillters, pagination } from "../../helpers/managementFeature.helper";
 
 export const buildingCreate = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.buildingCreate)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
+
   if (req.file) {
     req.body.avatar = req.file.path;
   } else {
@@ -60,6 +69,13 @@ export const buildingCreate = async (req: accountAdmin, res: Response) => {
 }
 
 export const buildingList = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.buildingList)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   try {
     const find: any = {
       deleted: false
@@ -157,6 +173,13 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
 }
 
 export const buildingDetail = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.buildingDetail)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   try {
     const id = req.params.id;
     const record = await Building.findOne({
@@ -199,6 +222,13 @@ export const buildingDetail = async (req: accountAdmin, res: Response) => {
 }
 
 export const buildingEdit = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.buildingEdit)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   try {
     const id = req.params.id;
     if (req.file) {
@@ -259,6 +289,13 @@ export const buildingEdit = async (req: accountAdmin, res: Response) => {
 }
 
 export const buildingDelete = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.buildingDelete)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   try {
     const id = req.params.id;
 
@@ -296,7 +333,13 @@ export const buildingDelete = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashBuildingList = async (req: accountAdmin, res: Response) => {
-
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.trashBuildingList)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   const find: any = {
     deleted: true
   }
@@ -362,6 +405,13 @@ export const trashBuildingList = async (req: accountAdmin, res: Response) => {
 }
 
 export const trashBuildingRecovery = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.trashBuildingRecovery)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   try {
     const id = req.params.id;
 
@@ -370,7 +420,7 @@ export const trashBuildingRecovery = async (req: accountAdmin, res: Response) =>
       deleted: true
     });
 
-    if(!building) {
+    if (!building) {
       res.json({
         code: "error",
         message: "The building is not found"
@@ -399,6 +449,13 @@ export const trashBuildingRecovery = async (req: accountAdmin, res: Response) =>
 }
 
 export const trashBuildingDelete = async (req: accountAdmin, res: Response) => {
+  if (!req.accountAdmin.permissions.includes(buildingPermissions.trashBuildingDelete)) {
+    res.json({
+      code: "error",
+      message: "You are not permission in feature!"
+    });
+    return;
+  }
   try {
     const id = req.params.id;
 
@@ -407,7 +464,7 @@ export const trashBuildingDelete = async (req: accountAdmin, res: Response) => {
       deleted: true,
     });
 
-    if(!building) {
+    if (!building) {
       res.json({
         code: "error",
         message: "The building is not found"
