@@ -16,5 +16,7 @@ router.post('/login', authValidate.loginValidate, accountAdminController.login)
 
 router.get('/logout', accountAdminController.logout);
 
-router.post('/profile/edit', upload.single("avatar"), middleware.accountVerify, authValidate.profileValidate, accountAdminController.profileEdit);
+router.patch('/profile/edit', upload.single("avatar"), middleware.accountVerify, authValidate.profileValidate, accountAdminController.profileEdit);
+
+router.patch('/change/password', middleware.accountVerify, accountAdminController.changePassword);
 export default router;

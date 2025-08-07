@@ -135,3 +135,35 @@ export const profileEdit = async (req: accountAdmin, res: Response) => {
     });
   }
 }
+
+export const changePassword = async (req: accountAdmin, res: Response) => {
+  const checkAccount = await AccountAdmin.findOne({
+    _id: req.accountAdmin._id,
+    deleted: false
+  });
+
+  const checkPassword = bcrypt.compareSync(req.body.currentPassword, String(checkAccount?.password));
+
+  if(!checkPassword) {
+    res.json({
+      code: "error",
+      message: "Your current password false!"
+    });
+    return;
+  };
+
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(req.body.newPassword, salt);
+
+  await AccountAdmin.updateOne({
+    _id: req.accountAdmin._id,
+  }, {
+    password: hash,
+    updateBy: req.accountAdmin._id,
+  });
+  
+  res.json({
+    code: "success",
+    message: "Your password has been changed!"
+  });
+}
