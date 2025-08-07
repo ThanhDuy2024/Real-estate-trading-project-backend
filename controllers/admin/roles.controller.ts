@@ -5,7 +5,6 @@ import AccountAdmin from "../../models/accountAdmin.model";
 import moment from "moment";
 import slugify from "slugify";
 import { dateFillters, pagination } from "../../helpers/managementFeature.helper";
-import { Category } from "../../models/category.model";
 import { rolePermissions, categoryPermissions } from "../../enums/permission.enum";
 
 export const roleCreate = async (req: accountAdmin, res: Response) => {
@@ -274,6 +273,22 @@ export const roleDelete = async (req: accountAdmin, res: Response) => {
         message: "item not found"
       });
       return;
+    }
+
+    const changeAccountRole = await AccountAdmin.find({
+      roleId: check.id,
+      deleted: false
+    });
+
+    if(changeAccountRole) {
+      for (const item of changeAccountRole) {
+        await AccountAdmin.updateOne({
+          _id: item._id
+        }, {
+          roleId: "",
+          updateBy: req.accountAdmin._id,
+        });
+      }
     }
 
     await Role.updateOne({

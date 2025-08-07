@@ -44,7 +44,7 @@ export const accountVerify = async (req: accountAdmin, res: Response, next: Next
       avatar: record.avatar ? record.avatar : "",
       phone: record.phone ? record.phone : "",
       address: record.address ? record.address : "",
-      roleId: record.roleId,
+      roleId: record.roleId ? record.roleId : ""
     };
 
     const permisstions = await Role.findOne({
