@@ -124,6 +124,8 @@ export const buildingList = async (req: accountAdmin, res: Response) => {
         id: item.id,
         name: item.name,
         avatar: item.avatar,
+        updatedByName: "",
+        createdByName: "",
       }
 
       if (item.updatedBy) {
