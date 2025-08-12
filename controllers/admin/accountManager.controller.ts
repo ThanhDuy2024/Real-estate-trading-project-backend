@@ -2,7 +2,10 @@ import { raw, Response } from "express";
 import bcrypt from "bcryptjs"
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
+import * as managementFeature from "../../helpers/managementFeature.helper";
 import moment from "moment";
+import slugify from "slugify";
+import { Role } from "../../models/roles.model";
 
 export const accountAdminCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
@@ -43,9 +46,39 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
     deleted: false
   };
 
+  //Search account name
+  if(req.query.search) {
+    const keyword = slugify(String(req.query.search), {
+      lower: true,
+    });
+    const regex = new RegExp(keyword);
+    find.slug = regex;
+  }
+  //end search account name
+
+  //role filter
+  if(req.query.roleId) {
+    const role = await Role.findOne({
+      _id: req.query.roleId,
+    });
+    if(role) {
+      find.roleId = role.id
+    }
+  }
+  //end role filter
+
+  //pagination
+  const sumDocuments = await AccountAdmin.countDocuments(find);
+  let page = "1";
+  if(req.query.page) {
+    page = String(req.query.page);
+  };
+  const pagination = managementFeature.pagination(sumDocuments, page);
+  //end pagination
+
   const record = await AccountAdmin.find(find).sort({
     createdAt: "desc"
-  });
+  }).skip(pagination.skip).limit(pagination.limit);
 
   const finalData: any = [];
   for (const item of record) {
@@ -53,6 +86,7 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
       id: item._id,
       fullName: item.fullName,
       avatar: item.avatar ? item.avatar : "",
+      roleId: item.roleId ? item.roleId : "",
       createdByName: "",
       updatedByName: "",
       createdAtFormat: "",
@@ -91,5 +125,6 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
   res.json({
     code: "success",
     data: finalData,
+    totalPage: pagination.pages,
   })
 }
