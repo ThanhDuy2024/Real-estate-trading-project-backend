@@ -6,7 +6,6 @@ import * as managementFeature from "../../helpers/managementFeature.helper";
 import moment from "moment";
 import slugify from "slugify";
 import { Role } from "../../models/roles.model";
-import { any } from "joi";
 
 export const accountAdminCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
@@ -208,6 +207,76 @@ export const accountAdminDetail = async (req: accountAdmin, res: Response) => {
     res.json({
       code: "error",
       message: error
+    })
+  }
+}
+
+export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    
+    const account = await AccountAdmin.findOne({
+      _id: id,
+      deleted: false
+    });
+
+    if(!account) {
+      res.json({
+        code: "error",
+        message: "Account is not found!"
+      });
+      return;
+    }
+
+    const emailCheck = await AccountAdmin.findOne({
+      _id: { $ne: account._id},
+      email: req.body.email
+    });
+
+    if(emailCheck) {
+      res.json({
+        code: "error",
+        message: "account email has been existed!"
+      });
+      return;
+    }
+
+    if(req.file) {
+      req.body.avatar = req.file.path;
+    } else {
+      delete req.body.avatar;
+    }
+
+    const role = await Role.findOne({
+      _id: req.body.roleId,
+      deleted: false
+    });
+
+    if(!role) {
+      res.json({
+        code: "error",
+        message: "account roleId has not been existed!"
+      });
+      return;
+    }
+
+    req.body.updateBy = req.accountAdmin._id
+
+    await AccountAdmin.updateOne({
+      _id: account._id,
+      deleted: false
+    }, req.body);
+
+    
+    res.json({
+      code: "success",
+      message: "account has been edited"
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "account has not been edited!"
     })
   }
 }

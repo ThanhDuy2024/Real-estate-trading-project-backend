@@ -13,4 +13,6 @@ router.post("/create", upload.single("avatar"), validate.accountManagerValidate,
 router.get("/list", accountManagerController.accountAdminList);
 
 router.get("/detail/:id", accountManagerController.accountAdminDetail);
+
+router.patch("/edit/:id", upload.single("avatar"), validate.accountManagerEditValidate, accountManagerController.accountAdminEdit);
 export default router;
