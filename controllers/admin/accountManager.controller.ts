@@ -6,6 +6,7 @@ import * as managementFeature from "../../helpers/managementFeature.helper";
 import moment from "moment";
 import slugify from "slugify";
 import { Role } from "../../models/roles.model";
+import { any } from "joi";
 
 export const accountAdminCreate = async (req: accountAdmin, res: Response) => {
   if (req.file) {
@@ -127,4 +128,86 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
     data: finalData,
     totalPage: pagination.pages,
   })
+}
+
+export const accountAdminDetail = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    const record = await AccountAdmin.findOne({
+      _id: id,
+      deleted: false
+    });
+
+    if(!record) {
+      res.json({
+        code: "error",
+        message: "account is not found"
+      });
+      return;
+    }
+
+    const finalData:any = {
+      id: record._id,
+      fullName: record.fullName,
+      avatar: record.avatar ? record.avatar : "",
+      roleId: record.roleId ? record.roleId : "",
+      email: record.email,
+      address: record.address ? record.address : "",
+      phone: record.phone ? record.phone : "",
+      updatedByName: "",
+      createdByName: "",
+      roleName: "",
+    }
+
+    if(record.createdAt) {
+      finalData.createdAtFormat = moment(record.createdAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    if(record.updatedAt) {
+      finalData.updatedAtFormat = moment(record.updatedAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    if(record.updateBy) {
+      const account = await AccountAdmin.findOne({
+        _id: record.updateBy,
+        deleted: false
+      });
+      
+      if(account) {
+        finalData.updatedByName = account.fullName;
+      }
+    }
+
+    if(record.createdBy) {
+      const account = await AccountAdmin.findOne({
+        _id: record.createdBy,
+        deleted: false
+      });
+      
+      if(account) {
+        finalData.createdByName = account.fullName;
+      }
+    }
+    
+    if(record.roleId) {
+      const role = await Role.findOne({
+        _id: record.roleId,
+        deleted: false
+      });
+
+      if(role) {
+        finalData.roleName = role.name
+      }
+    }
+
+    res.json({
+      code: "success",
+      data: finalData
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: error
+    })
+  }
 }
