@@ -400,7 +400,7 @@ export const accountAdminTrashRecovery = async (req: accountAdmin, res: Response
       deleted: true,
     });
 
-    if(!account) {
+    if (!account) {
       res.json({
         code: "error",
         message: "The account admin is not existed!"
@@ -414,7 +414,7 @@ export const accountAdminTrashRecovery = async (req: accountAdmin, res: Response
       deleted: false,
       updateBy: req.accountAdmin._id
     });
-    
+
     res.json({
       code: "success",
       message: "The account admin recovery successfuly!"
@@ -422,6 +422,38 @@ export const accountAdminTrashRecovery = async (req: accountAdmin, res: Response
   } catch (error) {
     res.json({
       code: "success",
+      message: error
+    })
+  }
+}
+
+export const accountAdminTrashDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    const account = await AccountAdmin.findOne({
+      _id: id,
+      deleted: true,
+    });
+
+    if (!account) {
+      res.json({
+        code: "error",
+        message: "The account admin is not existed!"
+      });
+      return;
+    }
+
+    await AccountAdmin.deleteOne({
+      _id: account._id
+    })
+
+    res.json({
+      code: "success",
+      message: "The account admin has been deleted!"
+    });
+  } catch (error) {
+    res.json({
+      code: "error",
       message: error
     })
   }

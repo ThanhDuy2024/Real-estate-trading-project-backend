@@ -21,4 +21,6 @@ router.delete("/delete/:id", accountManagerController.accountAdminDelete);
 router.get("/trash/list", accountManagerController.accountAdminTrashList);
 
 router.patch("/trash/recovery/:id", accountManagerController.accountAdminTrashRecovery);
+
+router.delete("/trash/delete/:id", accountManagerController.accountAdminTrashDelete);
 export default router;
