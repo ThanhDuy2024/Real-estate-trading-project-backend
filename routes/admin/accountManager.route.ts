@@ -15,4 +15,6 @@ router.get("/list", accountManagerController.accountAdminList);
 router.get("/detail/:id", accountManagerController.accountAdminDetail);
 
 router.patch("/edit/:id", upload.single("avatar"), validate.accountManagerEditValidate, accountManagerController.accountAdminEdit);
+
+router.delete("/delete/:id", accountManagerController.accountAdminDelete);
 export default router;

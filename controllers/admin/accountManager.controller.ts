@@ -1,4 +1,4 @@
-import { raw, Response } from "express";
+import e, { raw, Response } from "express";
 import bcrypt from "bcryptjs"
 import { accountAdmin } from "../../interfaces/accountAdmin.interface";
 import AccountAdmin from "../../models/accountAdmin.model";
@@ -277,6 +277,42 @@ export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
     res.json({
       code: "error",
       message: "account has not been edited!"
+    })
+  }
+}
+
+export const accountAdminDelete = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    const account = await AccountAdmin.findOne({
+      _id: id,
+      deleted: false
+    });
+
+    if(!account) {
+      res.json({
+        code: "error",
+        message: "The account admin is not found!"
+      });
+      return;
+    }
+
+    await AccountAdmin.updateOne({
+      _id: account._id
+    }, {
+      deleted: true,
+      deletedAt: Date.now(),
+      deletedBy: req.accountAdmin._id
+    });
+
+    res.json({
+      code: "success",
+      message: "The account admin has been deleted!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "The account admin has not been deleted!"
     })
   }
 }
