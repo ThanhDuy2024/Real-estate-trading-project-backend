@@ -316,3 +316,48 @@ export const accountAdminDelete = async (req: accountAdmin, res: Response) => {
     })
   }
 }
+
+export const accountAdminTrashList = async (req: accountAdmin, res: Response) => {
+  const find:any = {
+    deleted: true,
+  }
+
+  const account = await AccountAdmin.find(find)
+    .sort({
+      deletedAt: "desc"
+    });
+  
+  const finalData:any = [];
+
+  for (const item of account) {
+    const rawData:any = {
+      id: item._id,
+      fullName: item.fullName,
+      avatar: item.avatar,
+      roleId: item.roleId ? item.roleId : "",
+      deletedAtFormat: "",
+      deletedByName: "",
+    }
+
+    if(item.deletedAt) {
+      rawData.deletedAtFormat = moment(item.deletedAt).format("HH:mm DD/MM/YYYY");
+    }
+
+    if(item.deletedBy) {
+      const account = await AccountAdmin.findOne({
+        _id: item.deletedBy,
+        deleted: false
+      })
+
+      if(account) {
+        rawData.deletedByName = account.fullName; 
+      }
+    }
+
+    finalData.push(rawData);
+  }
+  res.json({
+    code: "success",
+    data: finalData
+  })
+}
