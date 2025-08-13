@@ -322,7 +322,24 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
     deleted: true,
   }
 
-  const account = await AccountAdmin.find(find)
+  //search
+  if(req.query.search) {
+    const keyword = slugify(String(req.query.search), {
+      lower: true,
+    });
+    const regex = new RegExp(keyword);
+    find.slug = regex;
+  }
+  //end search
+
+  let page = "1";
+  const sumDocuments = await AccountAdmin.countDocuments(find);
+  if(req.query.page) {
+    page = String(req.query.page);
+  }
+  const pagination = managementFeature.pagination(sumDocuments, page);
+
+  const account = await AccountAdmin.find(find).skip(pagination.skip).limit(pagination.limit)
     .sort({
       deletedAt: "desc"
     });
@@ -335,6 +352,7 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
       fullName: item.fullName,
       avatar: item.avatar,
       roleId: item.roleId ? item.roleId : "",
+      roleName: "",
       deletedAtFormat: "",
       deletedByName: "",
     }
@@ -354,10 +372,22 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
       }
     }
 
+    if(item.roleId) {
+      const role = await Role.findOne({
+        _id: item.roleId,
+        deleted: false,
+      });
+
+      if(role) {
+        rawData.roleName = role.name
+      }
+    }
+
     finalData.push(rawData);
   }
   res.json({
     code: "success",
-    data: finalData
+    data: finalData,
+    totalPage: pagination.pages
   })
 }
