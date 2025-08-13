@@ -19,4 +19,6 @@ router.patch("/edit/:id", upload.single("avatar"), validate.accountManagerEditVa
 router.delete("/delete/:id", accountManagerController.accountAdminDelete);
 
 router.get("/trash/list", accountManagerController.accountAdminTrashList);
+
+router.patch("/trash/recovery/:id", accountManagerController.accountAdminTrashRecovery);
 export default router;

@@ -47,7 +47,7 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
   };
 
   //Search account name
-  if(req.query.search) {
+  if (req.query.search) {
     const keyword = slugify(String(req.query.search), {
       lower: true,
     });
@@ -57,11 +57,11 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
   //end search account name
 
   //role filter
-  if(req.query.roleId) {
+  if (req.query.roleId) {
     const role = await Role.findOne({
       _id: req.query.roleId,
     });
-    if(role) {
+    if (role) {
       find.roleId = role.id
     }
   }
@@ -70,7 +70,7 @@ export const accountAdminList = async (req: accountAdmin, res: Response) => {
   //pagination
   const sumDocuments = await AccountAdmin.countDocuments(find);
   let page = "1";
-  if(req.query.page) {
+  if (req.query.page) {
     page = String(req.query.page);
   };
   const pagination = managementFeature.pagination(sumDocuments, page);
@@ -137,7 +137,7 @@ export const accountAdminDetail = async (req: accountAdmin, res: Response) => {
       deleted: false
     });
 
-    if(!record) {
+    if (!record) {
       res.json({
         code: "error",
         message: "account is not found"
@@ -145,7 +145,7 @@ export const accountAdminDetail = async (req: accountAdmin, res: Response) => {
       return;
     }
 
-    const finalData:any = {
+    const finalData: any = {
       id: record._id,
       fullName: record.fullName,
       avatar: record.avatar ? record.avatar : "",
@@ -158,43 +158,43 @@ export const accountAdminDetail = async (req: accountAdmin, res: Response) => {
       roleName: "",
     }
 
-    if(record.createdAt) {
+    if (record.createdAt) {
       finalData.createdAtFormat = moment(record.createdAt).format("HH:mm DD/MM/YYYY");
     }
 
-    if(record.updatedAt) {
+    if (record.updatedAt) {
       finalData.updatedAtFormat = moment(record.updatedAt).format("HH:mm DD/MM/YYYY");
     }
 
-    if(record.updateBy) {
+    if (record.updateBy) {
       const account = await AccountAdmin.findOne({
         _id: record.updateBy,
         deleted: false
       });
-      
-      if(account) {
+
+      if (account) {
         finalData.updatedByName = account.fullName;
       }
     }
 
-    if(record.createdBy) {
+    if (record.createdBy) {
       const account = await AccountAdmin.findOne({
         _id: record.createdBy,
         deleted: false
       });
-      
-      if(account) {
+
+      if (account) {
         finalData.createdByName = account.fullName;
       }
     }
-    
-    if(record.roleId) {
+
+    if (record.roleId) {
       const role = await Role.findOne({
         _id: record.roleId,
         deleted: false
       });
 
-      if(role) {
+      if (role) {
         finalData.roleName = role.name
       }
     }
@@ -214,13 +214,13 @@ export const accountAdminDetail = async (req: accountAdmin, res: Response) => {
 export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
   try {
     const id = req.params.id;
-    
+
     const account = await AccountAdmin.findOne({
       _id: id,
       deleted: false
     });
 
-    if(!account) {
+    if (!account) {
       res.json({
         code: "error",
         message: "Account is not found!"
@@ -229,11 +229,11 @@ export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
     }
 
     const emailCheck = await AccountAdmin.findOne({
-      _id: { $ne: account._id},
+      _id: { $ne: account._id },
       email: req.body.email
     });
 
-    if(emailCheck) {
+    if (emailCheck) {
       res.json({
         code: "error",
         message: "account email has been existed!"
@@ -241,7 +241,7 @@ export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
       return;
     }
 
-    if(req.file) {
+    if (req.file) {
       req.body.avatar = req.file.path;
     } else {
       delete req.body.avatar;
@@ -252,7 +252,7 @@ export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
       deleted: false
     });
 
-    if(!role) {
+    if (!role) {
       res.json({
         code: "error",
         message: "account roleId has not been existed!"
@@ -267,7 +267,7 @@ export const accountAdminEdit = async (req: accountAdmin, res: Response) => {
       deleted: false
     }, req.body);
 
-    
+
     res.json({
       code: "success",
       message: "account has been edited"
@@ -289,7 +289,7 @@ export const accountAdminDelete = async (req: accountAdmin, res: Response) => {
       deleted: false
     });
 
-    if(!account) {
+    if (!account) {
       res.json({
         code: "error",
         message: "The account admin is not found!"
@@ -318,12 +318,12 @@ export const accountAdminDelete = async (req: accountAdmin, res: Response) => {
 }
 
 export const accountAdminTrashList = async (req: accountAdmin, res: Response) => {
-  const find:any = {
+  const find: any = {
     deleted: true,
   }
 
   //search
-  if(req.query.search) {
+  if (req.query.search) {
     const keyword = slugify(String(req.query.search), {
       lower: true,
     });
@@ -334,7 +334,7 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
 
   let page = "1";
   const sumDocuments = await AccountAdmin.countDocuments(find);
-  if(req.query.page) {
+  if (req.query.page) {
     page = String(req.query.page);
   }
   const pagination = managementFeature.pagination(sumDocuments, page);
@@ -343,11 +343,11 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
     .sort({
       deletedAt: "desc"
     });
-  
-  const finalData:any = [];
+
+  const finalData: any = [];
 
   for (const item of account) {
-    const rawData:any = {
+    const rawData: any = {
       id: item._id,
       fullName: item.fullName,
       avatar: item.avatar,
@@ -357,28 +357,28 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
       deletedByName: "",
     }
 
-    if(item.deletedAt) {
+    if (item.deletedAt) {
       rawData.deletedAtFormat = moment(item.deletedAt).format("HH:mm DD/MM/YYYY");
     }
 
-    if(item.deletedBy) {
+    if (item.deletedBy) {
       const account = await AccountAdmin.findOne({
         _id: item.deletedBy,
         deleted: false
       })
 
-      if(account) {
-        rawData.deletedByName = account.fullName; 
+      if (account) {
+        rawData.deletedByName = account.fullName;
       }
     }
 
-    if(item.roleId) {
+    if (item.roleId) {
       const role = await Role.findOne({
         _id: item.roleId,
         deleted: false,
       });
 
-      if(role) {
+      if (role) {
         rawData.roleName = role.name
       }
     }
@@ -390,4 +390,39 @@ export const accountAdminTrashList = async (req: accountAdmin, res: Response) =>
     data: finalData,
     totalPage: pagination.pages
   })
+}
+
+export const accountAdminTrashRecovery = async (req: accountAdmin, res: Response) => {
+  try {
+    const id = req.params.id;
+    const account = await AccountAdmin.findOne({
+      _id: id,
+      deleted: true,
+    });
+
+    if(!account) {
+      res.json({
+        code: "error",
+        message: "The account admin is not existed!"
+      });
+      return;
+    }
+
+    await AccountAdmin.updateOne({
+      _id: account._id,
+    }, {
+      deleted: false,
+      updateBy: req.accountAdmin._id
+    });
+    
+    res.json({
+      code: "success",
+      message: "The account admin recovery successfuly!"
+    })
+  } catch (error) {
+    res.json({
+      code: "success",
+      message: error
+    })
+  }
 }
